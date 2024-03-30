@@ -1,0 +1,112 @@
+/* Reset default styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #EFECEC;
+}
+
+/* Style the top navigation bar */
+.topnav {
+  background-color: #EFECEC;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+}
+
+.topnav .logo {
+  color: #0C2D57;
+  font-size: 24px;
+}
+
+.topnav ul {
+  list-style-type: none;
+  display: flex;
+}
+
+.topnav ul li {
+  margin-right: 15px;
+}
+
+.topnav ul li a {
+  color: #0C2D57;
+  text-decoration: none;
+  padding: 10px;
+}
+
+/* Style the dropdown menu */
+.dropdown {
+  position: relative;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #EFECEC;
+  min-width: 160px;
+  z-index: 1;
+}
+
+.dropdown-content a {
+  color: #fff;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+/* Style the hero section */
+  .hero {
+    margin-top: 150px;
+    background-color: #EFECEC;
+    padding: 50px 0;
+    text-align: center;
+  }
+
+  .hero-content {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .hero h1 {
+    font-size: 48px;
+    color: #0C2D57;
+    margin-bottom: 20px;
+  }
+
+  .hero h3 {
+    font-size: 20px;
+    color: #FC6736;
+    margin-bottom: 30px;
+  }
+
+  .hero p {
+    font-size: 16px;
+    color: #0C2D57;
+    margin-bottom: 20px;
+  }
+
+  .cta-buttons .btn {
+    display: inline-block;
+    padding: 10px 20px;
+    margin-right: 10px;
+    background-color: #FC6736;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+  }
+
+  .cta-buttons .btn:hover {
+    color: #0C2D57;
+    background-color: #FFB0B0;
+  }

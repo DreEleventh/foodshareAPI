@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Donations DataTable</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <!-- DataTables CSS -->
+  <link href="https://cdn.datatables.net/1.10.22/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+<style>
+  .btn .add-btn{
+    margin-top: 20px;
+    margin-left: 40px;
+    background-color: #FC6736;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+    text-decoration: none;
+    display: inline-block;
+}
+</style>
+</head>
+<body>
+<div class="btn">
+  <a class="add-btn">Add New</a>
+</div>
+  <div class="container mt-5">
+    <table id="donations_table" class="table table-striped table-bordered" style="width:100%">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Donation Name</th>
+          <th>Description</th>
+          <th>Status</th>
+          <th>Date Donated</th>
+          <th>Quantity</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Data will be dynamically added here -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <!-- Bootstrap JS -->
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <!-- DataTables JS -->
+  <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.10.22/js/dataTables.bootstrap4.min.js"></script>
+  <script src="scrips_donations.js"></script>
+<!--  <script>-->
+<!--    $(document).ready(function() {-->
+<!--    // Initialize DataTable-->
+<!--    const table = $('#donations_table').DataTable();-->
+
+<!--    // Fetch data from API-->
+<!--    $.ajax({-->
+<!--      url: 'http://127.0.0.1:8000/donations/', // Your FastAPI endpoint URL-->
+<!--      method: 'GET',-->
+<!--      dataType: 'json',-->
+<!--      success: function(response) {-->
+<!--        if (response && response.donations && Array.isArray(response.donations)) {-->
+<!--          // Update DataTable with fetched data-->
+<!--          response.donations.forEach(function(item) {-->
+<!--            table.row.add([-->
+<!--              item.id,-->
+<!--              item.donation_name,-->
+<!--              item.description,-->
+<!--              item.donation_status,-->
+<!--              item.date_donated,-->
+<!--              item.quantity-->
+<!--            ]).draw(false);-->
+<!--          });-->
+<!--        } else {-->
+<!--          console.error('Invalid data format in API response');-->
+<!--        }-->
+<!--      },-->
+<!--      error: function(xhr, status, error) {-->
+<!--        console.error('Error fetching data:', error);-->
+<!--      }-->
+<!--    });-->
+<!--  });-->
+<!--  </script>-->
+</body>
+</html>
