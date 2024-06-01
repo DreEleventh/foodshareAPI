@@ -24,5 +24,3 @@ def generate_serial_number():
     numbers = ''.join(random.choices(string.digits, k=5))
     # Concatenate the letters and numbers
     return letters + numbers
-
-
