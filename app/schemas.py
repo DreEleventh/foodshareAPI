@@ -260,4 +260,4 @@ class TokenData(BaseModel):
     """
     Model to represent token data.
     """
-    id: Optional[str] = None
+    id: Optional[int] = None

@@ -27,7 +27,7 @@ def create_access_token(payload: dict):
         str: The encoded JWT token.
     """
     to_encode = payload.copy()
-    expire_time = datetime.now() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire_time = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire_time})
     token = jwt.encode(to_encode, SECRET_KEY, ALGORITHM)
     return token
