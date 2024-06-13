@@ -79,6 +79,7 @@ class DonationResponse(DonationsBase):
     Response model for a donation.
     """
     id: int
+    donor_id: int
     date_donated: datetime
 
     class Config:
@@ -260,4 +261,5 @@ class TokenData(BaseModel):
     """
     Model to represent token data.
     """
-    id: Optional[int] = None
+    donor_id: Optional[int] = None
+

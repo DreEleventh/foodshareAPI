@@ -49,13 +49,15 @@ def verify_access_token(token: str, credentials_exception):
     """
     try:
         payload = jwt.decode(token, SECRET_KEY, ALGORITHM)
-        donor_id: str = payload.get("donor_id")
+        donor_id: int = payload.get("donor_id")
 
         if donor_id is None:
             raise credentials_exception
 
-        token_data = schemas.TokenData(id=donor_id)
+        token_data = schemas.TokenData(donor_id=donor_id)
     except jwt.ExpiredSignatureError:
+        raise credentials_exception
+    except jwt.InvalidTokenError:
         raise credentials_exception
 
     return token_data
@@ -76,12 +78,22 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         HTTPException: If the token is invalid or the user is not found.
     """
     credentials_exception = HTTPException(
-        status_code=status.HTTP_402_PAYMENT_REQUIRED,
+        status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"}
     )
+    try:
+        access_token = verify_access_token(token, credentials_exception)
+    except HTTPException as e:
+        print(f"Token verification failed: {e.detail}")
+        raise
 
-    token = verify_access_token(token, credentials_exception)
-    donor = db.query(models.Donors).filter(models.Donors.id == token.id).first()
+    donor = db.query(models.Donors).filter(models.Donors.id == access_token.donor_id).first()
+
+    # print(access_token.donor_id)
+    # print(donor.donor_id)
+    if donor is None:
+        print("Donor not found")
+        raise credentials_exception
 
     return donor

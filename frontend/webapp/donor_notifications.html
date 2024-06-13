@@ -26,13 +26,13 @@
       </div>
       <ul class="nav-links">
         <li>
-          <a href="#" class="active">
+          <a href="donor_dashboard.html" >
             <i class="bx bx-grid-alt"></i>
             <span class="links_name">Dashboard</span>
           </a>
         </li>
         <li>
-          <a href="donor_notifications.html">
+          <a href="donor_notifications.html" class="active">
             <i class="bx bx-bell"></i>
             <span class="links_name">Notifications</span>
           </a>
@@ -87,72 +87,32 @@
       </nav>
 
       <div class="home-content">
-        <div class="overview-boxes">
-          <div class="box">
-            <div class="right-side">
-              <div class="box-topic">Total Donations</div>
-              <div class="number">40,876</div>
-              <div class="indicator">
-                <i class="bx bx-up-arrow-alt"></i>
-                <span class="text">Up from yesterday</span>
-              </div>
-            </div>
-            <i class="bx bx-cart-alt cart"></i>
-          </div>
-          <div class="box">
-            <div class="right-side">
-              <div class="box-topic">Total Pickups</div>
-              <div class="number">38,876</div>
-              <div class="indicator">
-                <i class="bx bx-up-arrow-alt"></i>
-                <span class="text">Up from yesterday</span>
-              </div>
-            </div>
-            <i class="bx bxs-cart-add cart two"></i>
-          </div>
-          <div class="box">
-            <div class="right-side">
-              <div class="box-topic">Total Saved</div>
-              <div class="number">$12,876</div>
-              <div class="indicator">
-                <i class="bx bx-up-arrow-alt"></i>
-                <span class="text">Up from yesterday</span>
-              </div>
-            </div>
-            <i class="bx bx-cart cart three"></i>
-          </div>
-          <div class="box">
-            <div class="right-side">
-              <div class="box-topic">Total Return</div>
-              <div class="number">11,086</div>
-              <div class="indicator">
-                <i class="bx bx-down-arrow-alt down"></i>
-                <span class="text">Down From Today</span>
-              </div>
-            </div>
-            <i class="bx bxs-cart-download cart four"></i>
-          </div>
+        <div class="place_holder_text">
+
+            <p class="text">No Notifications</p>
+
         </div>
 
-        <div id="datatable_container" class="container mt-5" style="width: 100%;">
-          <button id="addRowBtn" class="btn btn-primary mb-3">Add Row</button>
-          <table id="donations_table" class="table table-striped table-bordered" style="width: 100%;">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Quantity</th>
-                <th>Description</th>
-                <th>Status</th>
-                <th>Date Donated</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- Data will be dynamically added here -->
-            </tbody>
-          </table>
-        </div>
+<!--        <div id="datatable_container" class="container mt-5" style="width: 100%;">-->
+<!--          <button id="addRowBtn" class="btn btn-primary mb-3">Add Row</button>-->
+<!--          <table id="donations_table" class="table table-striped table-bordered" style="width: 100%;">-->
+<!--            <thead>-->
+<!--              <tr>-->
+<!--                <th>ID</th>-->
+<!--                <th>Name</th>-->
+<!--                <th>Quantity</th>-->
+<!--                <th>Description</th>-->
+<!--                <th>Status</th>-->
+<!--                <th>Date Donated</th>-->
+<!--                <th>Actions</th>-->
+<!--              </tr>-->
+<!--            </thead>-->
+<!--            <tbody>-->
+<!--              &lt;!&ndash; Data will be dynamically added here &ndash;&gt;-->
+<!--            </tbody>-->
+<!--          </table>-->
+<!--        </div>-->
+
 
         <!-- Add Row Modal -->
         <div class="modal fade" id="addRowModal" tabindex="-1" role="dialog" aria-labelledby="addRowModalLabel" aria-hidden="true">

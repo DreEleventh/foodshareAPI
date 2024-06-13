@@ -50,9 +50,9 @@ class Donations(Base):
     description = Column(Text, nullable=False)
     donation_status = Column(String, nullable=False)
     date_donated = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
-    # donors_id = Column(Integer, ForeignKey('donors.id', ondelete="CASCADE"), nullable=False)
+    donor_id = Column(Integer, ForeignKey('donors.id', ondelete="CASCADE"), nullable=False)
 
-    # donor = relationship("Donors")
+    donor = relationship("Donors")
 
 
 class DonationStatus(Base):
