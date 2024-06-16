@@ -43,7 +43,7 @@ def display_all_donors(db: Session = Depends(get_db)):
 
 
 # Get the current logged in donor
-@router.get("/user/")
+@router.get("/current_user/")
 def fetch_current_donor(db: Session = Depends(get_db),
                         current_donor: models.Donors = Depends(oauth2.get_current_user)):
     """
