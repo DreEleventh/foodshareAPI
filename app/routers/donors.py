@@ -2,7 +2,7 @@ from fastapi import FastAPI, Response, status, HTTPException, Depends, APIRouter
 from typing import Optional, List
 from sqlalchemy.orm import Session
 
-from .. import models, schemas, utills
+from .. import models, schemas, utills, oauth2
 from ..databaseConn import get_db
 
 router = APIRouter(
@@ -40,6 +40,23 @@ def display_all_donors(db: Session = Depends(get_db)):
     """
     donors = db.query(models.Donors).order_by(models.Donors.id.asc()).all()
     return donors
+
+
+# Get the current logged in donor
+@router.get("/user/")
+def fetch_current_donor(db: Session = Depends(get_db),
+                        current_donor: models.Donors = Depends(oauth2.get_current_user)):
+    """
+    Endpoint to get the current logged in user.
+    """
+    fetch_donor = db.query(models.Donors).filter(models.Donors.id ==
+                                                 current_donor.id).order_by(models.Donors.id.asc()).first()
+
+    if fetch_donor.id != current_donor.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail="Not authorized to perform the requested action.")
+
+    return fetch_donor
 
 
 # Get donor by id endpoint
@@ -91,7 +108,6 @@ def update_donor(donor_id: int, donor_update: schemas.RegisterDonor, db: Session
     db.commit()
 
     return {"message": f"Donor with id: {donor_id} successfully updated"}
-
 
 # # Donor type endpoint
 # @app.get("/donor_type")
