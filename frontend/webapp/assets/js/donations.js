@@ -60,10 +60,15 @@ $(document).ready(function() {
 
 // Fetch data from API and update DataTable
 function fetchDataAndUpdateTable(table) {
+    const token = localStorage.getItem('accessToken');
+
     $.ajax({
-        url: 'http://127.0.0.1:8000/donations/',
+        url: 'http://127.0.0.1:8000/donations/user',
         method: 'GET',
         dataType: 'json',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        },
         success: function(response) {
             if (Array.isArray(response)) {
                 response.forEach(function(item) {
@@ -84,9 +89,23 @@ function fetchDataAndUpdateTable(table) {
 
             },
             error: function(xhr, status, error) {
-                console.error('Error fetching data:', error);
+                if (xhr.status === 401){
+                    // Token has expired, handle token renewal or redirect to login
+                    console.error('Token has expired');
+                    redirectToLoginPage();
+                }else{
+                    console.error('Error fetching data', error);
+                }
             }
         });
+}
+
+function redirectToLoginPage() {
+    // Remove the access token from localStorage
+    localStorage.removeItem('accessToken');
+  
+    // Redirect to the login page
+    window.location.href = 'http://localhost:63342/foodshareAPI/frontend/webapp/login_register_form.html';
 }
 
 // Add a new row to the DataTable
@@ -96,10 +115,15 @@ async function addDonation(table) {
     const quantity = $('#quantity').val();
     const description = $('#description').val();
 
+    // Retrieve the JWT token from localStorage
+    const token = localStorage.getItem('accessToken');
+
+
     const response = await fetch('http://127.0.0.1:8000/donations/', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` // Include the JWT token in the Authorization header
         },
         body: JSON.stringify({
             donation_name,
@@ -143,10 +167,16 @@ function updateDonation(table, donationId) {
     const newQuantity = $('#editQuantity').val();
     const newDescription = $('#editDescription').val();
 
+    // Retrieve the JWT token from localStorage
+    const token = localStorage.getItem('accessToken');
+
     $.ajax({
         url: 'http://127.0.0.1:8000/donations/' + donationId + '/',
         method: 'PUT',
         contentType: 'application/json',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        },
         data: JSON.stringify({
             donation_name: newName,
             quantity: newQuantity,
@@ -159,8 +189,14 @@ function updateDonation(table, donationId) {
             $('#editRowForm').trigger('reset');
         },
         error: function(xhr, status, error) {
-            console.error('Error updating row:', error);
-            alert('Error updating row. Please try again.');
+            if(xhr.status === 401){
+                // Handle unauthorized access
+                alert('Your session has expired. Please log in again.');
+                redirectToLoginPage();
+            }else{
+                console.error('Error updating row:', error);
+                alert('Error updating row. Please try again.');
+            }
         }
 
     });
@@ -173,17 +209,30 @@ function openDeleteConfirmationModal(donationId, table) {
     $('#deleteConfirmed').off().click(function() {
         // const row = $(this).closest('tr'); // Use closest('tr') to target the row
         // const donationId = row.data()[0]; // Assuming ID is in the first column
+        
+        // Retrieve the JWT token from localStorage
+        const token = localStorage.getItem('accessToken');
+
         $.ajax({
             url: 'http://127.0.0.1:8000/donations/' + donationId + '/',
             method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
             success: function(response) {
                 table.row($(this).parents('tr')).remove().draw();
                 $('#deleteConfirmationModal').modal('hide');
                 alert('Row deleted successfully!');
             },
             error: function(xhr, status, error) {
-                console.error('Error deleting row:', error);
-                alert('Error deleting row. Please try again.');
+                if(xhr.status === 401){
+                    // Handle unauthorized access
+                    alert('Your session has expired. Please log in again.');
+                    redirectToLoginPage();
+                }else{
+                    console.error('Error deleting row:', error);
+                    alert('Error deleting row. Please try again.');
+                }   
             }
         });
     });

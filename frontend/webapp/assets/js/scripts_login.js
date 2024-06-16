@@ -79,6 +79,16 @@ const container = document.querySelector(".container"),
                     }),
                     success: function (credentialsResponse) {
                         console.log('Credentials creation successful:', credentialsResponse);
+
+                        // Clear registration form fields
+                        $('#donor_registration input').val('');
+
+                        // Pre-fill email in the username field of the login form
+                        $('#login_form input[name="username"]').val(formData.email);
+                        
+                        // Switch to the login form
+                        container.classList.remove('active');
+
                     },
                     error: function (error) {
                         console.error('Error creating credentials:', error.responseJSON.detail);
@@ -145,3 +155,9 @@ loginForm.addEventListener('submit', async (event) => {
     alert('An error occurred during login. Please try again.');
   }
 });
+
+// After successful credential creation
+// $('#donor_registration input').val(''); // Clear registration form fields
+// $('#login_form input[name="username"]').val(formData.email); // Pre-fill email in the username field
+// container.classList.remove('active'); // Switch to the login form
+
