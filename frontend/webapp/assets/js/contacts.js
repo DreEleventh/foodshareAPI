@@ -1,3 +1,5 @@
+import { fetchCurrentDonorName, logout } from './app_utils.js';
+
 $(document).ready(function() {
     const table = $('#contacts_table').DataTable({
         columnDefs: [
@@ -17,8 +19,11 @@ $(document).ready(function() {
         ]
     });
 
+
     // Fetch data from API and update table
     fetchDataAndUpdateTable(table);
+
+    fetchCurrentDonorName();
 
     // Handle add row button click
     $('#addRowBtn').click(function() {
@@ -49,6 +54,11 @@ $(document).ready(function() {
         const contactId = rowData[0]; // Assuming ID is in the first column
         openDeleteConfirmationModal(contactId, table);
     });
+
+    $('#logoutBtn').click(function() {
+        logout();
+      });
+
 });
 
 // Fetch data from API and update DataTable
