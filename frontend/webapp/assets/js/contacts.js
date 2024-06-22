@@ -4,7 +4,7 @@ $(document).ready(function() {
     const table = $('#contacts_table').DataTable({
         columnDefs: [
             {
-                targets: 5, // Assuming the date_donated column is at index 4 (zero-based index)
+                targets: 4, // Assuming the date_donated column is at index 4 (zero-based index)
                 render: function(data, type, row) {
                     if (type === 'display' && data) {
                         const date = new Date(data);
@@ -63,10 +63,16 @@ $(document).ready(function() {
 
 // Fetch data from API and update DataTable
 function fetchDataAndUpdateTable(table) {
+
+    const token = localStorage.getItem('accessToken');
+
     $.ajax({
-        url: 'http://127.0.0.1:8000/contacts/',
+        url: 'http://127.0.0.1:8000/contacts/user',
         method: 'GET',
         dataType: 'json',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        },
         success: function(response) {
             if (Array.isArray(response)) {
                 response.forEach(function(item) {
@@ -75,7 +81,6 @@ function fetchDataAndUpdateTable(table) {
                         item.contact_name,
                         item.email,
                         item.phone_num,
-                        item.donor_id,
                         item.date_created,
                         '<button class="btn btn-primary edit-btn" style="font-size: 14px; padding: 3px 5px; margin: 1px;">Edit</button> ' +
                         '<button class="btn btn-danger delete-btn" style="font-size: 14px; padding: 3px 5px; margin: 1px;">Delete</button>'
@@ -86,28 +91,48 @@ function fetchDataAndUpdateTable(table) {
             }
         },
         error: function(xhr, status, error) {
-            console.error('Error fetching data:', error);
+            if(xhr.status === 401){
+                console.error('Token has expired');
+                redirectToLoginPage();
+            }else{
+                console.error('Error fetching data:', error);
+            }
+            
         }
     });
 }
+
+
+function redirectToLoginPage() {
+    // Remove the access token from localStorage
+    localStorage.removeItem('accessToken');
+  
+    // Redirect to the login page
+    window.location.href = 'http://localhost:63342/foodshareAPI/frontend/webapp/login_register_form.html';
+}
+
 
 // Add a new row to the DataTable
 async function addContact(table) {
     const contact_name = $('#name').val();
     const email = $('#email').val();
     const phone_num = $('#phone_number').val();
-    const donor_id = $('#donorID').val();
+    // const donor_id = $('#donorID').val();
+
+    // Retrieve the JWT token from localStorage
+    const token = localStorage.getItem('accessToken');
 
     const response = await fetch('http://127.0.0.1:8000/contacts/', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` // Include the JWT token in the Authorization header
         },
         body: JSON.stringify({
             contact_name,
             email,
             phone_num,
-            donor_id
+            // donor_id
         })
     });
 
@@ -122,7 +147,7 @@ async function addContact(table) {
     $('#addRowModal').modal('hide');
 
     // Display success message
-    alert('Donation added successfully!');
+    alert('Contact added successfully!');
 
     return data;
 }
@@ -141,17 +166,23 @@ function updateContact(table, contactId) {
     const newName = $('#editName').val();
     const newEmail = $('#editEmail').val();
     const newPhonenum = $('#editPhoneNumber').val();
-    const newDonorID = $('#editDonorID').val();
+    // const newDonorID = $('#editDonorID').val();
+
+    // Retrieve the JWT token from localStorage
+    const token = localStorage.getItem('accessToken');
 
     $.ajax({
          url: 'http://127.0.0.1:8000/contacts/' + contactId + '/',
         method: 'PUT',
         contentType: 'application/json',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        },
         data: JSON.stringify({
             contact_name: newName,
             email: newEmail,
             phone_num: newPhonenum,
-            donor_id: newDonorID
+            // donor_id: newDonorID
         }),
         success: function(response) {
             $('#editRowModal').modal('hide');
@@ -160,8 +191,14 @@ function updateContact(table, contactId) {
             table.ajax.reload(); // Reload the table data
         },
         error: function(xhr, status, error) {
-            console.error('Error updating row:', error);
-            alert('Error updating row. Please try again.');
+            if(xhr.status === 401){
+                // Handle unauthorized access
+                alert('Your session has expired. Please log in again.');
+                redirectToLoginPage();
+            }else{
+                console.error('Error updating row:', error);
+                alert('Error updating row. Please try again.');
+            }
         }
     });
 }
@@ -170,17 +207,31 @@ function updateContact(table, contactId) {
 function openDeleteConfirmationModal(contactId, table) {
     $('#deleteConfirmationModal').modal('show');
     $('#deleteConfirmed').off().click(function() {
+
+        // Retrieve the JWT token from localStorage
+        const token = localStorage.getItem('accessToken');
+
         $.ajax({
             url: `http://127.0.0.1:8000/contacts/${contactId}/`,
             method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
             success: function(response) {
                 table.row($(`tr[data-id="${contactId}"]`)).remove().draw();
                 $('#deleteConfirmationModal').modal('hide');
                 alert('Row deleted successfully!');
             },
             error: function(xhr, status, error) {
-                console.error('Error deleting row:', error);
-                alert('Error deleting row. Please try again.');
+                if(xhr.status === 401){
+                    // Handle unauthorized access
+                    alert('Your session has expired. Please log in again.');
+                    redirectToLoginPage();
+                }else{
+                    console.error('Error deleting row:', error);
+                    alert('Error deleting row. Please try again.');
+                }
+                
             }
         });
     });

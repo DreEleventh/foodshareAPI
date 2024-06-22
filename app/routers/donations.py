@@ -24,15 +24,11 @@ def make_donation(donation: schemas.MakeDonation, db: Session = Depends(get_db),
     db.commit()
     db.refresh(new_donation)
 
-    # # Fetch recipient email addresses
-    # recipient_emails = [recipient.email for recipient in db.query(models.Recipients).all()]
-    #
-    # # Send notification email
-    # utills.send_donation_notification_email(
-    #     recipient_emails,
-    #     new_donation.donation_name,
-    #     current_donor.donor_name
-    # )
+    # Update the donor's total_donations
+    donor = db.query(models.Donors).filter(models.Donors.id == current_donor.id).first()
+    if donor:
+        donor.total_donations = (donor.total_donations or 0) + 1
+        db.commit()
 
     return new_donation
 

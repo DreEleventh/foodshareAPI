@@ -150,7 +150,6 @@ class ContactPerson(BaseModel):
     contact_name: str
     email: str
     phone_num: str
-    donor_id: int
 
 
 class RegisterContactPerson(ContactPerson):

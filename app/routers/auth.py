@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from fastapi import APIRouter, Depends, status, HTTPException
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
@@ -34,12 +36,17 @@ def donor_login(donor_credentials: OAuth2PasswordRequestForm = Depends(), db: Se
     if not utills.verify_passcode(donor_credentials.password, donor.password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Credentials")
 
+    # Update last_login_time
+    donor.last_login_time = datetime.now()
+    db.commit()
+
     access_token = oauth2.create_access_token(payload={"donor_id": donor.donor_id})
     return {"access_token": access_token, "token_type": "bearer"}
 
 
 # @router.post("/donor_logout", status_code=status.HTTP_200_OK)
-# def donor_logout(current_donor: models.DonorCredentials = Depends(oauth2.get_current_user), db: Session = Depends(get_db)):
+# def donor_logout(current_donor: models.DonorCredentials = Depends(oauth2.get_current_user),
+# db: Session = Depends(get_db)):
 #     token = request.headers.get("Authorization").split(" ")[1]
 #
 #     # Decode the token to get the "jti" (JWT ID) claim

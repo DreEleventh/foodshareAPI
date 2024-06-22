@@ -7,7 +7,7 @@ $(document).ready(function() {
             {'class': "compact"},
             // {"scrollX": true},
             { width: '15%', targets: 1 },
-            { width: '15%', targets: 6 },
+            { width: '18%', targets: 6 },
             { width: '25%', targets: 3 }, // Set width of the Actions column to 20%
             {
                 targets: 5, // Assuming the date_donated column is at index 4 (zero-based index)
@@ -89,7 +89,8 @@ function fetchDataAndUpdateTable(table) {
                         item.donation_status,
                         item.date_donated,
                         '<button class="btn btn-primary edit-btn" style="font-size: 16px; padding: 3px 5px; margin: 1px;">Edit</button> ' +
-                        '<button class="btn btn-danger delete-btn" style="font-size: 16px; padding: 3px 5px; margin: 1px;">Delete</button>'
+                        '<button class="btn btn-danger delete-btn" style="font-size: 16px; padding: 3px 5px; margin: 1px;">Delete</button>' +
+                        '<button class="btn btn-secondary post-btn" style="font-size: 16px; padding: 3px 5px; margin: 2px;">Post</button>'  
                     ]).draw(false);
                 });
                 } else {
