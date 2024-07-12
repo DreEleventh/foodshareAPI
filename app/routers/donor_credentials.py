@@ -24,3 +24,4 @@ def create_donor_credentials(donor_cred: schemas.DonorCredentials, db: Session =
     db.refresh(new_donor_cred)
 
     return new_donor_cred
+

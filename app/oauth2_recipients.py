@@ -7,8 +7,8 @@ from sqlalchemy.orm import Session
 from . import schemas, databaseConn, models
 # from .config import settings
 
+oauth2_recipient_scheme = OAuth2PasswordBearer(tokenUrl='recipient_login')
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl='donor_login')
 
 # Constants for JWT
 SECRET_KEY = "jksownkdnaunrpahfuyenclaybpnwbqa4hei2098453erfgswknifbsxawqin6thfveomcswlxawsbbuy"
@@ -49,12 +49,12 @@ def verify_access_token(token: str, credentials_exception):
     """
     try:
         payload = jwt.decode(token, SECRET_KEY, ALGORITHM)
-        donor_id: int = payload.get("donor_id")
+        recipient_id: int = payload.get("recipient_id")
 
-        if donor_id is None:
+        if recipient_id is None:
             raise credentials_exception
 
-        token_data = schemas.TokenData(id=donor_id)
+        token_data = schemas.TokenData(id=recipient_id)
     except jwt.ExpiredSignatureError:
         raise credentials_exception
     except jwt.InvalidTokenError:
@@ -63,7 +63,7 @@ def verify_access_token(token: str, credentials_exception):
     return token_data
 
 
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(databaseConn.get_db)):
+def get_current_recipient(token: str = Depends(oauth2_recipient_scheme), db: Session = Depends(databaseConn.get_db)):
     """
     Retrieve the current user based on the JWT token.
 
@@ -88,12 +88,13 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         print(f"Token verification failed: {e.detail}")
         raise
 
-    donor = db.query(models.Donors).filter(models.Donors.id == access_token.id).first()
+    recipient = db.query(models.Recipients).filter(models.Recipients.id == access_token.id).first()
 
     # print(access_token.donor_id)
     # print(donor.donor_id)
-    if donor is None:
-        print("Donor not found")
+    if recipient is None:
+        print("Recipient not found")
         raise credentials_exception
 
-    return donor
+    return recipient
+

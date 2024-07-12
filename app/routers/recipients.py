@@ -2,7 +2,7 @@ from typing import Optional, List
 from fastapi import FastAPI, Response, status, HTTPException, Depends, APIRouter
 from sqlalchemy.orm import Session
 
-from .. import models, schemas, utills
+from .. import models, schemas, utills, oauth2_recipients
 from ..databaseConn import get_db
 
 router = APIRouter(
@@ -11,14 +11,24 @@ router = APIRouter(
 )
 
 
-# Register Recipient end point
+# Register Recipient endpoint
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.RecipientResponse)
 def register_recipient(recipient: schemas.RegisterRecipient, db: Session = Depends(get_db)):
-    new_recipient = models.Recipients(**recipient.dict())
-    db.add(new_recipient)
-    db.commit()
-    db.refresh(new_recipient)
-    return new_recipient
+
+    try:
+
+        new_recipient = models.Recipients(**recipient.dict())
+        db.add(new_recipient)
+        db.commit()
+        db.refresh(new_recipient)
+
+        if new_recipient:
+            return new_recipient
+        else:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                                detail=f"Failed to create recipient.")
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
 # Get all recipients endpoints
@@ -26,6 +36,21 @@ def register_recipient(recipient: schemas.RegisterRecipient, db: Session = Depen
 def get_all_recipients(db: Session = Depends(get_db)):
     recipients = db.query(models.Recipients).order_by(models.Recipients.id.asc()).all()
     return recipients
+
+
+# Get the current logged in recipient
+@router.get("/current_recipient/")
+def fetch_current_recipient(db: Session = Depends(get_db),
+                            current_recipient: models.Recipients = Depends(oauth2_recipients.get_current_recipient)):
+
+    fetch_recipient = db.query(models.Recipients).filter(
+        models.Recipients.id == current_recipient.id).order_by(models.Recipients.id.asc()).first()
+
+    if fetch_recipient.id != current_recipient.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail="Not authorized to perform the requested action.")
+
+    return fetch_recipient
 
 
 # Get recipient by id

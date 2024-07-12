@@ -198,7 +198,7 @@ class RecipientsBase(BaseModel):
     email: str
     address: str
     phone_number: str
-    type_id: int
+    # type_id: int
 
 
 class RegisterRecipient(RecipientsBase):
@@ -220,11 +220,30 @@ class RecipientResponse(BaseModel):
         from_attributes = True
 
 
+class RecipientCredentials(BaseModel):
+    """
+    Model to represent donor credentials.
+    """
+    username: EmailStr
+    password: str
+    recipient_id: int
+
+
+class RecipientCredentialsResponse(BaseModel):
+    """
+    Response model for donor credentials.
+    """
+    recipient_id: int
+    username: EmailStr
+
+    class Config:
+        from_attributes = True
+
+
 class DonationRequestBase(BaseModel):
     """
     Base model for a donation request.
     """
-    recipient_id: int
     item_name: str
     quantity: int
 
@@ -241,7 +260,7 @@ class RequestResponse(DonationRequestBase):
     Response model for a donation request.
     """
     id: int
-    recipient_id: int
+    recipient_id: Optional[int] = None
     request_date: datetime
 
     class Config:
@@ -260,5 +279,5 @@ class TokenData(BaseModel):
     """
     Model to represent token data.
     """
-    donor_id: Optional[int] = None
+    id: Optional[int] = None
 

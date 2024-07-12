@@ -51,7 +51,7 @@ def fetch_user_donations(db: Session = Depends(get_db),
 
 # Get all donations endpoint
 @router.get("/all", response_model=List[schemas.DonationResponse])
-def get_all_donations(db: Session = Depends(get_db), current_donor: int = Depends(oauth2.get_current_user)):
+def get_all_donations(db: Session = Depends(get_db)):
     """
     Endpoint to get all donations.
     """
@@ -101,6 +101,30 @@ def get_donation_by_id(donation_id: int, db: Session = Depends(get_db),
     return {"donation": single_donation}
 
 
+# Donation pickup endpoint
+@router.put("/pickup/{donation_id}")
+def pickup_donation(donation_id: int, db: Session = Depends(get_db)):
+    """
+    Endpoint to pick up a donation by updating its status to 'posted'.
+    """
+
+    # Retrieve the donation from the database by its ID
+    update_query = db.query(models.Donations).filter(models.Donations.id == donation_id)
+
+    donation = update_query.first()
+
+    if not donation:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"Donation with id: {donation_id} does not exist.")
+
+    # Update the status of the donation
+    donation.donation_status = 'Picked'
+    db.commit()
+    db.refresh(donation)
+
+    return {"message": f"Donation with id {donation_id} successfully updated"}
+
+
 # Delete a donation by ID endpoint
 @router.delete("/{donation_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_donation(donation_id: int, db: Session = Depends(get_db),
@@ -137,7 +161,7 @@ def update_donation(donation_id: int, donation_update: schemas.MakeDonation, db:
     donation = update_query.first()
 
     if donation is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Donation with id {donation_id} not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Donation with id {donation_id} not found.")
 
     if donation.donor_id != current_donor.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,

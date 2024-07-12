@@ -26,7 +26,7 @@ def register_donor(donor: schemas.RegisterDonor, db: Session = Depends(get_db)):
         if new_donor:
             return new_donor
         else:
-            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed tp create donor.")
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to create donor.")
 
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))

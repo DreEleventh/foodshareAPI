@@ -1,14 +1,10 @@
+import { fetchCurrentRecipientName, logout_recipient} from './app_utils.js';
+
 $(document).ready(function() {
     const table = $('#request_table').DataTable({
         columnDefs: [
-//            {"aaSorting": [[0, "desc"]]},
-//            {'class': "compact"},
-//            // {"scrollX": true},
-//            { width: '15%', targets: 1 },
-//            { width: '15%', targets: 6 },
-//            { width: '25%', targets: 3 }, // Set width of the Actions column to 20%
             {
-                targets: 4, // Assuming the date_donated column is at index 4 (zero-based index)
+                targets: 3, // Assuming the date_donated column is at index 4 (zero-based index)
                 render: function(data, type, row) {
                     // Parse the date string and format it as yyyy/mm/dd
                     if (type === 'display' && data) {
@@ -26,6 +22,8 @@ $(document).ready(function() {
 
     // Fetch data from API and update table
     fetchDataAndUpdateTable(table);
+
+    fetchCurrentRecipientName();
 
     // Handle add row button click
     $('#addRowBtn').click(function() {
@@ -56,20 +54,29 @@ $(document).ready(function() {
         const donationId = rowData[0]; // Assuming ID is in the first column
         openDeleteConfirmationModal(donationId, table);
     });
+
+
+    $('#recipientLogoutBtn').click(function() {
+        logout_recipient();
+      });
 });
 
 // Fetch data from API and update DataTable
 function fetchDataAndUpdateTable(table) {
+    const token = localStorage.getItem('accessToken')
+
     $.ajax({
-        url: 'http://127.0.0.1:8000/donation_request',
+        url: 'http://127.0.0.1:8000/donation_request/user',
         method: 'GET',
         dataType: 'json',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        },
         success: function(response) {
             if (Array.isArray(response)) {
                 response.forEach(function(item) {
                     table.row.add([
                         item.id,
-                        item.recipient_id,
                         item.item_name,
                         item.quantity,
                         item.request_date,
@@ -83,25 +90,45 @@ function fetchDataAndUpdateTable(table) {
 
             },
             error: function(xhr, status, error) {
-                console.error('Error fetching data:', error);
+                if (xhr.status === 401){
+                    console.error('Token has expired');
+                    redirectT0LoginPage();
+                }else{
+                    console.error('Error fetching data:', error);
+                }
             }
         });
 }
 
+
+function redirectToLoginPage() {
+    // Remove the access token from localStorage
+    localStorage.removeItem('accessToken');
+  
+    // Redirect to the login page
+    window.location.href = 'http://localhost:63342/foodshareAPI/frontend/webapp/recipient_login_register.html';
+}
+
+
+
 // Add a new row to the DataTable
 async function addDonation(table) {
     // Extract data from form using destructuring assignment (assuming form ID is 'addRowForm')
-    const recipient_id = $('#recipient_id').val();
+    // const recipient_id = $('#recipient_id').val();
     const item_name = $('#item_name').val();
     const quantity = $('#quantity').val();
+
+    // Retrieve the JWT token from localStorage
+    const token = localStorage.getItem('accessToken');
 
     const response = await fetch('http://127.0.0.1:8000/donation_request', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` // Include the JWT token in the Authorization header
         },
         body: JSON.stringify({
-            recipient_id,
+            // recipient_id,
             item_name,
             quantity,
 //            description,
@@ -110,7 +137,7 @@ async function addDonation(table) {
     });
 
     if (!response.ok) {
-        throw new Error(`Error adding donation: ${await response.text()}`);
+        throw new Error(`Error adding donation request: ${await response.text()}`);
     }
 
     const data = await response.json();
@@ -120,12 +147,12 @@ async function addDonation(table) {
     $('#addRowModal').modal('hide');
 
     // Display success message
-    alert('Donation added successfully!'); // You can replace this with a more informative message
+    alert('Donation request added successfully!'); // You can replace this with a more informative message
 
     // Add the new row to the table
     table.row.add([
         data.id,
-        data.recipient_id,
+        // data.recipient_id,
         data.item_name,
         data.quantity,
         data.request_date,
@@ -140,26 +167,32 @@ async function addDonation(table) {
 
 // Open the edit modal and populate with current row data
 function openEditModal(rowData) {
-    $('#editRecipient').val(rowData[1]);
-    $('#editName').val(rowData[2]);
-    $('#editQuantity').val(rowData[3]);
+    // $('#editRecipient').val(rowData[1]);
+    $('#editName').val(rowData[1]);
+    $('#editQuantity').val(rowData[2]);
     $('#editRowModal').modal('show');
 }
 
 // Update the row in the DataTable
 function updateDonation(table, itemId) {
-    const newRecipientId = $('#editRecipient').val();
+    // const newRecipientId = $('#editRecipient').val();
     const newName = $('#editName').val();
     const newQuantity = $('#editQuantity').val();
+
+    // Retrieve the JWT token from localStorage
+    const token = localStorage.getItem('accessToken');
 
     $.ajax({
         url: 'http://127.0.0.1:8000/donation_request/' + itemId + '/',
         method: 'PUT',
         contentType: 'application/json',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        },
         data: JSON.stringify({
-            recipient_id: newRecipientId,
+            // recipient_id: newRecipientId,
             item_name: newName,
-            quantity: newQuantity,
+            quantity: newQuantity
              // description: newDescription
             // Add other fields as needed
         }),
@@ -172,7 +205,7 @@ function updateDonation(table, itemId) {
             const row = table.row($(this).closest('tr'));
             row.data([
                 response.id,
-                response.recipient_id,
+                // response.recipient_id,
                 response.item_name,
                 response.quantity,
                 response.request_date,
@@ -182,8 +215,14 @@ function updateDonation(table, itemId) {
 
         },
         error: function(xhr, status, error) {
-            console.error('Error updating row:', error);
-            alert('Error updating row. Please try again.');
+            if(xhr.status === 401){
+                // Handle unauthorized access
+                alert('Your session has expired. Please log in again.');
+                redirectToLoginPage();
+            }else{
+                console.error('Error updating row:', error);
+                alert('Error updating row. Please try again.');
+            }
         }
 
     });
@@ -196,17 +235,29 @@ function openDeleteConfirmationModal(itemId, table) {
     $('#deleteConfirmed').off().click(function() {
         // const row = $(this).closest('tr'); // Use closest('tr') to target the row
         // const donationId = row.data()[0]; // Assuming ID is in the first column
+        // Retrieve the JWT token from localStorage
+        const token = localStorage.getItem('accessToken');
+
         $.ajax({
             url: 'http://127.0.0.1:8000/donation_request/' + itemId + '/',
             method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
             success: function(response) {
                 table.row($(this).parents('tr')).remove().draw();
                 $('#deleteConfirmationModal').modal('hide');
                 alert('Row deleted successfully!');
             },
             error: function(xhr, status, error) {
-                console.error('Error deleting row:', error);
-                alert('Error deleting row. Please try again.');
+                if(xhr.status === 401){
+                    alert('Your session has expired. Please log in again.');
+                    redirectToLoginPage()
+                }else{
+                    console.error('Error deleting row:', error);
+                    alert('Error deleting row. Please try again.');
+                }
+                
             }
         });
     });

@@ -55,6 +55,18 @@ class Donations(Base):
     donor = relationship("Donors")
 
 
+class DonationPickup(Base):
+    __tablename__ = 'donations_pickup'
+    __table_args__ = {'extend_existing': True}
+    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False, index=True)
+    donation_id = Column(Integer, ForeignKey('donations.id', ondelete='CASCADE'), nullable=False)
+    recipient_id = Column(Integer, ForeignKey('recipients.id', ondelete='CASCADE'), nullable=False)
+    date_picked = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
+
+    donations = relationship("Donations")
+    recipients = relationship("Recipients")
+
+
 class DonationStatus(Base):
     """
     Model for the 'donation_statuses' table.

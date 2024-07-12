@@ -115,7 +115,7 @@ function redirectToLoginPage() {
     localStorage.removeItem('accessToken');
   
     // Redirect to the login page
-    window.location.href = 'http://localhost:63342/foodshareAPI/frontend/webapp/login_register_form.html';
+    window.location.href = 'http://localhost:63342/foodshareAPI/frontend/webapp/donor_login_register_form.html';
 }
 
 // Add a new row to the DataTable

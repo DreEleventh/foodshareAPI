@@ -5,7 +5,7 @@ from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from ..databaseConn import get_db
-from .. import models, schemas, utills, oauth2
+from .. import models, schemas, utills, oauth2, oauth2_recipients
 
 router = APIRouter(
     tags=["Authentication"]
@@ -43,6 +43,23 @@ def donor_login(donor_credentials: OAuth2PasswordRequestForm = Depends(), db: Se
     access_token = oauth2.create_access_token(payload={"donor_id": donor.donor_id})
     return {"access_token": access_token, "token_type": "bearer"}
 
+
+@router.post("/recipient_login", response_model=schemas.Token)
+def recipient_login(recipient_credentials: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    recipient = db.query(models.RecipientCredentials).filter(
+        models.RecipientCredentials.username == recipient_credentials.username).first()
+
+    if not recipient:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Credentials")
+
+    if not utills.verify_passcode(recipient_credentials.password, recipient.password):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Credentials")
+
+    recipient.last_login_time = datetime.now()
+    db.commit()
+
+    access_token = oauth2_recipients.create_access_token(payload={"recipient_id": recipient.recipient_id})
+    return {"access_token": access_token, "token_type": "bearer"}
 
 # @router.post("/donor_logout", status_code=status.HTTP_200_OK)
 # def donor_logout(current_donor: models.DonorCredentials = Depends(oauth2.get_current_user),
@@ -84,4 +101,3 @@ def donor_login(donor_credentials: OAuth2PasswordRequestForm = Depends(), db: Se
 #         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Logout failed: {str(e)}")
 #
 #     return {"message": "Successfully logged out"}
-

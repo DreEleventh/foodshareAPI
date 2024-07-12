@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 from app import models, schemas, utills
 from app.databaseConn import engine, get_db
 from app.routers import (donations, donors, donor_contacts, donor_credentials, employees,
-                         recipients, donation_request, donation_header, donation_items, auth)
+                         recipients, recipient_credentials, donation_request, donation_header, donation_items, auth)
 
 # Create database tables based on models
 models.Base.metadata.create_all(bind=engine)
@@ -36,7 +36,9 @@ app.include_router(donor_credentials.router)
 app.include_router(employees.router)
 app.include_router(employees.router)
 app.include_router(recipients.router)
+app.include_router(recipient_credentials.router)
 app.include_router(donation_request.router)
 app.include_router(donation_header.router)
 app.include_router(donation_items.router)
+
 app.include_router(auth.router)

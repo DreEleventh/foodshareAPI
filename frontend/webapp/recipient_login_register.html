@@ -9,17 +9,20 @@
      <!-- Favicons -->
     <link href="assets/img/favicon-32x32.png" rel="icon">
     <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
-    
+
     <!-- ===== Iconscout CSS ===== -->
     <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
 
+    <!-- Boxicons CDN Link -->
+    <link href="https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css" rel="stylesheet"/>
+
     <!-- ===== CSS ===== -->
-    <link rel="stylesheet" href="assets/css/styles_login.css">
-         
-    <title>Login & Registration Form</title> 
+    <link rel="stylesheet" href="assets/css/styles_recipient_login.css">
+
+    <title>Recipient Login & Registration</title>
 </head>
 <body>
-    
+
     <div class="container">
         <div class="forms">
             <div class="form login">
@@ -35,7 +38,7 @@
                     </div>
                     <div class="input-field">
                         <input type="password" class="password" name="password" placeholder="Enter your password" required>
-                        <i class="uil uil-lock icon"></i>
+                        <i class='bx bx-lock-alt'></i>
                         <i class="uil uil-eye-slash showHidePw"></i>
                     </div>
 
@@ -44,7 +47,7 @@
                             <input type="checkbox" id="logCheck">
                             <label for="logCheck" class="text">Remember me</label>
                         </div>
-                        
+
                         <a href="#" class="text">Forgot password?</a>
                     </div>
 
@@ -64,7 +67,7 @@
             <div class="form">
                 <span class="title">Registration</span>
 
-                <form method="post" id="donor_registration" action="#">
+                <form method="post" id="recipient_registration" action="#">
                     <div class="input-field">
                         <label for="name">
                             <input type="text" id="name" name="donor_name" placeholder="Enter your name" required>
@@ -75,7 +78,13 @@
                         <label for="email">
                             <input type="text" id="email" name="email" placeholder="Enter your email" required>
                         </label>
-                        <i class="uil uil-envelope icon"></i>
+                        <i class="bx bx-envelope icon"></i>
+                    </div>
+                     <div class="input-field">
+                        <label for="address">
+                            <input type="text" id="address" name="address" placeholder="Enter your address" required>
+                        </label>
+                        <i class="bx bx-home icon"></i>
                     </div>
                     <div class="input-field">
                         <label for="phone_number">
@@ -83,12 +92,7 @@
                         </label>
                         <i class="uil uil-phone icon"></i>
                     </div>
-                    <div class="input-field">
-                        <label for="address">
-                            <input type="text" id="address" name="address" placeholder="Enter your address" required>
-                        </label>
-                        <i class="uil uil-home icon"></i>
-                    </div>
+
 <!--                    <div>-->
 <!--                        <label for="type_dropdown">-->
 <!--&lt;!&ndash;                            <input type="number" id="type" name="typeid" placeholder="Enter your donor type" required>&ndash;&gt;-->
@@ -130,6 +134,6 @@
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="assets/js/scripts_login.js"></script>
+    <script src="assets/js/scripts_recipient_login.js"></script>
 </body>
 </html>
