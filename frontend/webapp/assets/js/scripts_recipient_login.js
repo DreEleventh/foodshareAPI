@@ -142,7 +142,7 @@ loginForm.addEventListener('submit', async (event) => {
       localStorage.setItem('accessToken', token);
 
       // Optionally, you can redirect the user to another page after successful login
-      window.location.href = 'http://localhost:63342/foodshareAPI/frontend/webapp/recipient_landing.html?_ijt=35res018oljtdsgn7a10sid2b7&_ij_reload=RELOAD_ON_SAVE';
+      window.location.href = 'http://localhost:63342/foodshareAPI/frontend/webapp/recipients/recipient_landing.html?_ijt=35res018oljtdsgn7a10sid2b7&_ij_reload=RELOAD_ON_SAVE';
     } else {
       // Handle the error response
       const errorData = await response.json();

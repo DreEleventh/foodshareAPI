@@ -62,6 +62,19 @@ $(document).ready(function() {
     });
 
 
+      // Event delegation for dynamically created buttons
+      $('#donations_table tbody').on('click', '.view-btn', function() {
+        let data = table.row($(this).parents('tr')).data();
+        showDonationDetails(data);
+    });
+
+
+    $('#postDonationBtn').click(function() {
+        let donationId = $('#donationId').text();
+        postDonation(donationId);
+    });
+
+
     $('#logoutBtn').click(function() {
         logout();
       });
@@ -71,8 +84,8 @@ $(document).ready(function() {
 function fetchDataAndUpdateTable(table) {
     const token = localStorage.getItem('accessToken');
 
-    $.ajax({
-        url: 'http://127.0.0.1:8000/donations/user',
+    return $.ajax({
+        url: 'http://127.0.0.1:8000/donations/user/submitted',
         method: 'GET',
         dataType: 'json',
         headers: {
@@ -80,6 +93,10 @@ function fetchDataAndUpdateTable(table) {
         },
         success: function(response) {
             if (Array.isArray(response)) {
+
+                // Clear the table before adding new data
+                table.clear();
+
                 response.forEach(function(item) {
                     table.row.add([
                         item.id,
@@ -90,8 +107,8 @@ function fetchDataAndUpdateTable(table) {
                         item.date_donated,
                         '<button class="btn btn-primary edit-btn" style="font-size: 16px; padding: 3px 5px; margin: 1px;">Edit</button> ' +
                         '<button class="btn btn-danger delete-btn" style="font-size: 16px; padding: 3px 5px; margin: 1px;">Delete</button>' +
-                        '<button class="btn btn-secondary post-btn" style="font-size: 16px; padding: 3px 5px; margin: 2px;">Post</button>'  
-                    ]).draw(false);
+                        '<button class="btn btn-secondary view-btn" style="font-size: 16px; padding: 3px 5px; margin: 2px;">View</button>'  
+                    ]).draw();
                 });
                 } else {
                     console.error('Invalid data format in API response');
@@ -115,7 +132,7 @@ function redirectToLoginPage() {
     localStorage.removeItem('accessToken');
   
     // Redirect to the login page
-    window.location.href = 'http://localhost:63342/foodshareAPI/frontend/webapp/donor_login_register_form.html';
+    window.location.href = 'http://localhost:63342/foodshareAPI/frontend/webapp/donors/donor_login_register_form.html';
 }
 
 // Add a new row to the DataTable
@@ -156,6 +173,7 @@ async function addDonation(table) {
     // Display success message
     alert('Donation added successfully!'); // You can replace this with a more informative message
 
+    await fetchDataAndUpdateTable(table);
 
     return data; // You can return the response data if needed
 }
@@ -197,6 +215,9 @@ function updateDonation(table, donationId) {
             $('#editRowModal').modal('hide');
             alert('Row updated successfully!');
             $('#editRowForm').trigger('reset');
+
+            // Reload the table
+            fetchDataAndUpdateTable(table);
         },
         error: function(xhr, status, error) {
             if(xhr.status === 401){
@@ -233,6 +254,9 @@ function openDeleteConfirmationModal(donationId, table) {
                 table.row($(this).parents('tr')).remove().draw();
                 $('#deleteConfirmationModal').modal('hide');
                 alert('Row deleted successfully!');
+
+                // Reload the table
+                fetchDataAndUpdateTable(table);
             },
             error: function(xhr, status, error) {
                 if(xhr.status === 401){
@@ -245,6 +269,44 @@ function openDeleteConfirmationModal(donationId, table) {
                 }   
             }
         });
+    });
+}
+
+function showDonationDetails(data) {
+    $('#donationId').text(data[0]);
+    $('#donationName').text(data[1]);
+    $('#donationQuantity').text(data[2]);
+    $('#donationDescription').text(data[3]);
+    $('#donationStatus').text(data[4]);
+    $('#donationDate').text(data[5]);
+    $('#postDonationModal').modal('show');
+}
+
+function postDonation(donationId){
+    alert('Posting donation with ID: ' + donationId);
+    $.ajax({
+        url: 'http://127.0.0.1:8000/donations/post/' + donationId + '/',
+        method: 'PUT',
+        contentType: 'application/json', 
+        success: function(response){
+            alert('Donation posted successfully!');
+            $('#postDonationModal').modal('hide');
+
+            // Update the status in the DataTable
+            var table = $('#donations_table').DataTable();
+            var row = table.row(function(idx, data, node) {
+                return data[0] == donationId; // Assuming the donation ID is in the first column
+            });
+            var data = row.data();
+            data[4] = 'Posted'; // Assuming the status column is at index 4
+            row.data(data).draw();
+
+            // // Reload the table
+            fetchDataAndUpdateTable(table);
+        }, 
+        error: function(xhr, status, error) {
+            alert('Error posting donation: ' + xhr.responseText);
+        }
     });
 }
 

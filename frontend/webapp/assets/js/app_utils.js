@@ -57,7 +57,7 @@ export function logout() {
     localStorage.removeItem('accessToken');
   
     // Redirect to the login page
-    window.location.href = 'http://localhost:63342/foodshareAPI/frontend/webapp/donor_login_register_form.html';
+    window.location.href = 'http://localhost:63342/foodshareAPI/frontend/webapp/donors/donor_login_register_form.html?_ijt=hkbagdafopqr7agte6u3aks0gc&_ij_reload=RELOAD_ON_SAVE';
 }
 
 
@@ -66,5 +66,5 @@ export function logout_recipient() {
   localStorage.removeItem('accessToken');
 
   // Redirect to the login page
-  window.location.href = 'http://localhost:63342/foodshareAPI/frontend/webapp/recipient_login_register.html';
+  window.location.href = 'http://localhost:63342/foodshareAPI/frontend/webapp/recipients/recipient_login_register.html?_ijt=63rml12afd6gkp6cumtk710it0&_ij_reload=RELOAD_ON_SAVE';
 }

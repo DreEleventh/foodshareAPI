@@ -98,16 +98,6 @@ function showDonationDetails(data) {
 }
 
 
-// function pickUpDonation(donationId) {
-//     alert('Picking up donation with ID: ' + donationId);
-//     $.ajax({
-//         url: 'http://127.0.0.1:8000/donations/pickup/' + donationId + '/',
-//         method: 'PUT',
-//         contentType: 'application/json'
-//     })
-//     $('#donationModal').modal('hide');
-// }
-
 function pickUpDonation(donationId) {
     alert('Picking up donation with ID: ' + donationId);
     $.ajax({

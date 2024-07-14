@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Response, status, HTTPException, Depends, APIRouter
 from typing import Optional, List
 from sqlalchemy.orm import Session
+from sqlalchemy import and_
 
 from .. import models, schemas, utills, oauth2, notify
 from ..databaseConn import get_db
@@ -42,6 +43,22 @@ def fetch_user_donations(db: Session = Depends(get_db),
     """
     donations = (db.query(models.Donations).filter(models.Donations.donor_id == current_donor.id)
                  .order_by(models.Donations.id.desc()).all())
+
+    # Convert Donations objects into dictionaries
+    donation_dicts = [donation.__dict__ for donation in donations]
+
+    return donation_dicts
+
+
+@router.get("/user/submitted", response_model=List[schemas.DonationResponse])
+def fetch_submitted_donations(db: Session = Depends(get_db),
+                              current_donor: models.Donors = Depends(oauth2.get_current_user)):
+    """
+    Endpoint to get all donations for a specific user where the status is 'Submitted'.
+    """
+    donations = (db.query(models.Donations).filter(and_(models.Donations.donor_id == current_donor.id,
+                                                        models.Donations.donation_status == 'Submitted')).order_by(
+        models.Donations.id.desc()).all())
 
     # Convert Donations objects into dictionaries
     donation_dicts = [donation.__dict__ for donation in donations]
@@ -122,6 +139,23 @@ def pickup_donation(donation_id: int, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(donation)
 
+    return {"message": f"Donation with id {donation_id} successfully updated"}
+
+
+# Donation post endpoint
+@router.put("/post/{donation_id}")
+def post_donation(donation_id: int, db: Session = Depends(get_db)):
+    update_query = db.query(models.Donations).filter(models.Donations.id == donation_id)
+
+    donation = update_query.first()
+
+    if not donation:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"Donation with id: {donation_id} does not exist.")
+
+    donation.donation_status = "Posted"
+    db.commit()
+    db.refresh(donation)
     return {"message": f"Donation with id {donation_id} successfully updated"}
 
 
