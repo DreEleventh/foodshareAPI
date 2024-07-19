@@ -80,6 +80,17 @@ def get_all_donations(db: Session = Depends(get_db)):
     return donation_dicts
 
 
+# Get all posted  donations
+@router.get("/all/posted", response_model=List[schemas.DonationResponse])
+def get_all_posted_donations(db: Session = Depends(get_db)):
+    donation_query = db.query(models.Donations).filter(and_(models.Donations.donation_status == 'Posted')).order_by(
+        models.Donations.id.desc()).all()
+
+    donation_dict = [donations.__dict__ for donations in donation_query]
+
+    return donation_dict
+
+
 # Get a single donation by ID endpoint for particular user
 @router.get("/user/{donation_id}")
 def fetch_single_donation(donation_id: int, db: Session = Depends(get_db),

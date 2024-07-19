@@ -52,7 +52,7 @@ function fetchDataAndUpdateTable(table) {
     // const token = localStorage.getItem('accessToken');
 
     $.ajax({
-        url: 'http://127.0.0.1:8000/donations/all',
+        url: 'http://127.0.0.1:8000/donations/all/posted',
         method: 'GET',
         dataType: 'json',
 
@@ -66,8 +66,8 @@ function fetchDataAndUpdateTable(table) {
                         item.description,
                         item.donation_status,
                         item.date_donated,
-                        '<button class="btn btn-secondary view-btn" style="font-size: 16px; padding: 3px 5px; margin: 2px;">View</button>'+
-                        '<button class="btn btn-primary pickup-btn" style="font-size: 16px; padding: 3px 5px; margin: 2px;">Pick Up</button>'
+                        '<button class="btn btn-secondary view-btn" style="font-size: 16px; padding: 3px 5px; margin: 2px;">View</button>'
+                        // '<button class="btn btn-primary pickup-btn" style="font-size: 16px; padding: 3px 5px; margin: 2px;">Pick Up</button>'
                     ]).draw(false);
                 });
                 } else {
