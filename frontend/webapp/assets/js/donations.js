@@ -26,8 +26,35 @@ $(document).ready(function() {
         ]
     });
 
+    const historyTable = $('#donations_history_table').DataTable({
+        columnDefs: [
+            // {"aaSorting": [[0, "desc"]]},
+            // {'class': "compact"},
+            // // {"scrollX": true},
+            // { width: '15%', targets: 1 },
+            // { width: '18%', targets: 6 },
+            // { width: '25%', targets: 3 }, // Set width of the Actions column to 20%
+            {
+                targets: 5, // Assuming the date_donated column is at index 4 (zero-based index)
+                render: function(data, type, row) {
+                    // Parse the date string and format it as yyyy/mm/dd
+                    if (type === 'display' && data) {
+                        var date = new Date(data);
+                        var year = date.getFullYear();
+                        var month = ('0' + (date.getMonth() + 1)).slice(-2); // Adding leading zero if needed
+                        var day = ('0' + date.getDate()).slice(-2); // Adding leading zero if needed
+                        return year + '/' + month + '/' + day;
+                    }
+                    return data;
+                }
+            }
+        ]
+    });
+
     // Fetch data from API and update table
     fetchDataAndUpdateTable(table);
+
+    fetchDataAndUpdateHistoryTable(historyTable);
 
     fetchCurrentDonorName();
 
@@ -114,6 +141,51 @@ function fetchDataAndUpdateTable(table) {
                     console.error('Invalid data format in API response');
                 }
 
+            },
+            error: function(xhr, status, error) {
+                if (xhr.status === 401){
+                    // Token has expired, handle token renewal or redirect to login
+                    console.error('Token has expired');
+                    redirectToLoginPage();
+                }else{
+                    console.error('Error fetching data', error);
+                }
+            }
+        });
+}
+
+
+// Fetch data from API and update DataTable
+function fetchDataAndUpdateHistoryTable(historyTable) {
+    const token = localStorage.getItem('accessToken');
+
+    return $.ajax({
+        url: 'http://127.0.0.1:8000/donations/user',
+        method: 'GET',
+        dataType: 'json',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        },
+        success: function(response) {
+            if (Array.isArray(response)) {
+
+                // Clear the table before adding new data
+                historyTable.clear();
+
+                response.forEach(function(item) {
+                    historyTable.row.add([
+                        item.id,
+                        item.donation_name,
+                        item.quantity,
+                        item.description,
+                        item.donation_status,
+                        item.date_donated
+                    ]);
+                });
+                } else {
+                    console.error('Invalid data format in API response');
+                }
+                historyTable.draw();
             },
             error: function(xhr, status, error) {
                 if (xhr.status === 401){
